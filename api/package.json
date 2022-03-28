@@ -1,0 +1,20 @@
+{
+  "name": "verbal",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node main.js",
+    "dev": "nodemon main.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^3.11.0",
+    "fastify": "^3.27.4",
+    "fastify-multipart": "^5.3.1",
+    "jsonwebtoken": "^8.5.1",
+    "prisma": "^3.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}

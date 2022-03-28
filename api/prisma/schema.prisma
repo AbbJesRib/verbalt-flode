@@ -1,0 +1,23 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["mongoDb"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Status {
+  NOT_STARTED
+  STARTED
+  FINISHED
+}
+
+model Test {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  status Status @default(NOT_STARTED)
+}
