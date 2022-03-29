@@ -14,10 +14,6 @@ const privateKey = "secret";
 // - 1: started
 // - 2: finished
 
-app.get("/", (req, res) => {
-  res.send({ hello: "world" });
-});
-
 app.post("/test", async (req, res) => {
   // create new test
   // return test id, token
@@ -58,9 +54,13 @@ app.put("/test/:id", async (req, res) => {
 
   // todo: validate data
 
-  // todo: send to google api
+  // todo: upload to s3
 
   res.send({ result: "ok" });
+});
+
+app.all("*", (req, res) => {
+  res.code(404).send({ error: "not found" });
 });
 
 app.listen(process.env.PORT, (err, address) => {

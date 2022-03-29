@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
   previewFeatures = ["mongoDb"]
@@ -12,12 +9,12 @@ datasource db {
 }
 
 enum Status {
-  NOT_STARTED
-  STARTED
-  FINISHED
+  NEW
+  IN_PROGRESS
+  COMPLETED
 }
 
 model Test {
   id String @id @default(auto()) @map("_id") @db.ObjectId
-  status Status @default(NOT_STARTED)
+  status Status @default(NEW)
 }
