@@ -19,7 +19,7 @@ app.post("/test", async (req, res) => {
   res.send({ id, token });
 });
 
-app.get("/test/:id", async (req, res) => {
+app.use("/test/:id", async (req, res, next) => {
   const { id } = req.params;
   const token = req.headers.authorization.split(" ")[1];
 
@@ -33,9 +33,18 @@ app.get("/test/:id", async (req, res) => {
   }
 
   if (!isValid) {
-    res.code(401).send({ error: "invalid token" });
+    res.status(401).send({ error: "invalid token" });
     return;
   }
+
+  res.locals.id = id;
+  res.locals.token = token;
+
+  next();
+});
+
+app.get("/test/:id", async (req, res) => {
+  const { id } = res.locals;
 
   const test = await prisma.test.findUnique({
     where: { id },
@@ -43,7 +52,7 @@ app.get("/test/:id", async (req, res) => {
 
   // test is null if not found
   if (!test) {
-    res.code(404).send({ error: "test not found" });
+    res.status(404).send({ error: "test not found" });
     return;
   }
 
@@ -55,6 +64,8 @@ app.put("/test/:id", async (req, res) => {
   // save result
   // return ok
 
+  const { id } = res.locals;
+
   const data = await req.file();
 
   // todo: validate data
@@ -65,7 +76,7 @@ app.put("/test/:id", async (req, res) => {
 });
 
 app.all("*", (req, res) => {
-  res.code(404).send({ error: "not found" });
+  res.status(404).send({ error: "not found" });
 });
 
 app.listen(process.env.PORT, (err, address) => {
