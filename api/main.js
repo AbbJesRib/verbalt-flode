@@ -1,11 +1,10 @@
-const fastify = require("fastify");
+const express = require("express");
 const jwt = require("jsonwebtoken");
-const { PrismaClient, Prisma } = require("@prisma/client");
+const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
-const app = fastify({ logger: true });
-app.register(require("fastify-multipart"));
+const app = express();
 
 // status
 // - 0: not started
@@ -13,6 +12,7 @@ app.register(require("fastify-multipart"));
 // - 2: finished
 
 app.post("/test", async (req, res) => {
+  // Create new test
   const { id } = await prisma.test.create({ data: {} });
   const token = jwt.sign({ id }, process.env.JWT_SECRET);
 
