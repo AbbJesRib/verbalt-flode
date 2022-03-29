@@ -1,13 +1,11 @@
 const fastify = require("fastify");
 const jwt = require("jsonwebtoken");
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient, Prisma } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
 const app = fastify({ logger: true });
 app.register(require("fastify-multipart"));
-
-const privateKey = "secret";
 
 // status
 // - 0: not started
@@ -15,11 +13,8 @@ const privateKey = "secret";
 // - 2: finished
 
 app.post("/test", async (req, res) => {
-  // create new test
-  // return test id, token
-
   const { id } = await prisma.test.create({ data: {} });
-  const token = jwt.sign({ id }, privateKey);
+  const token = jwt.sign({ id }, process.env.JWT_SECRET);
 
   res.send({ id, token });
 });
@@ -28,12 +23,16 @@ app.get("/test/:id", async (req, res) => {
   const { id } = req.params;
   const token = req.headers.authorization.split(" ")[1];
 
-  try {
-    jwt.verify(token, privateKey);
+  let isValid = false;
 
-    // todo: validate test id
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (decoded.id === id) isValid = true;
   } catch (err) {
     console.log(err);
+  }
+
+  if (!isValid) {
     res.code(401).send({ error: "invalid token" });
     return;
   }
@@ -41,6 +40,12 @@ app.get("/test/:id", async (req, res) => {
   const test = await prisma.test.findUnique({
     where: { id },
   });
+
+  // test is null if not found
+  if (!test) {
+    res.code(404).send({ error: "test not found" });
+    return;
+  }
 
   res.send(test);
 });
