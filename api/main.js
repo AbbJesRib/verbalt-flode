@@ -1,10 +1,28 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const { PrismaClient } = require("@prisma/client");
+const aws = require("aws-sdk");
+const multer = require("multer");
+const multerS3 = require("multer-s3");
 
 const prisma = new PrismaClient();
-
 const app = express();
+
+const s3 = new aws.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+});
+
+const storage = multerS3({
+  s3,
+  bucket: "game-intelligence",
+  key: (req, file, cb) => {
+    const fileExtension = file.originalname.split(".").pop();
+    cb(null, `${Date.now().toString()}.${fileExtension}`);
+  },
+});
+
+const upload = multer({ storage });
 
 // status
 // - 0: not started
@@ -19,6 +37,7 @@ app.post("/test", async (req, res) => {
   res.send({ id, token });
 });
 
+// Middleware for validating JWT token
 app.use("/test/:id", async (req, res, next) => {
   const { id } = req.params;
   const token = req.headers.authorization.split(" ")[1];
@@ -38,7 +57,6 @@ app.use("/test/:id", async (req, res, next) => {
   }
 
   res.locals.id = id;
-  res.locals.token = token;
 
   next();
 });
@@ -59,16 +77,27 @@ app.get("/test/:id", async (req, res) => {
   res.send(test);
 });
 
-app.put("/test/:id", async (req, res) => {
+app.put("/test/:id", upload.array("audio", 1), async (req, res) => {
   // analyze audio
   // save result
   // return ok
 
   const { id } = res.locals;
 
-  const data = await req.file();
+  // todo: validate id
 
-  // todo: validate data
+  // form data
+  // const { audio } = req.body;
+  console.log(req.files);
+
+  // todo: validate file
+  // console.log(data);
+
+  // const params = {
+  //   Bucket: "testBucket", // pass your bucket name
+  //   Key: `${id}-1.ogg`, // file will be saved as testBucket/contacts.csv
+  //   Body: JSON.stringify(data, null, 2),
+  // };
 
   // todo: upload to s3
 
@@ -79,9 +108,6 @@ app.all("*", (req, res) => {
   res.status(404).send({ error: "not found" });
 });
 
-app.listen(process.env.PORT, (err, address) => {
-  if (err) {
-    app.log.error(err);
-    process.exit(1);
-  }
+app.listen(process.env.PORT, (err) => {
+  console.log(`Listening on port ${process.env.PORT}`);
 });
