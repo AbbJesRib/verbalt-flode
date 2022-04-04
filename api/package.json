@@ -1,0 +1,22 @@
+{
+  "name": "verbal",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node main.js",
+    "dev": "nodemon main.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^3.11.0",
+    "aws-sdk": "^2.1103.0",
+    "express": "^4.17.3",
+    "jsonwebtoken": "^8.5.1",
+    "multer": "^1.4.4",
+    "multer-s3": "^2.10.0",
+    "prisma": "^3.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}

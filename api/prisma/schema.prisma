@@ -1,0 +1,20 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["mongoDb"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Status {
+  NEW
+  IN_PROGRESS
+  COMPLETED
+}
+
+model Test {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  status Status @default(NEW)
+}
