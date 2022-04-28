@@ -1,33 +1,65 @@
 <template>
   <div class="record">
-    <audio-recorder
-    upload-url="YOUR_API_URL"
-    :attempts="3"
-    :time="2"
-    :headers="headers"
-    :before-recording="callback"
-    :pause-recording="callback"
-    :after-recording="callback"
-    :select-record="callback"
-    :before-upload="callback"
-    :successful-upload="callback"
-    :failed-upload="callback"/>
+    <button v-if="recording" @click="stop()">Stop Recording</button>
+    <button v-else @click="start()">Start Recording</button>
+
+    <button v-if="mp3.url != mp3Comp.url" @click="play()">Playback</button>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import Vue from "vue";
+import microm from "../main";
 
 export default Vue.extend({
-  name: 'message',
-  props: {
-    
+  name: "message",
+  props: {},
+  data() {
+    return {
+      recording: false,
+      mp3: {
+        url: "hhh",
+        blob: "flkdnf",
+        buffer: "dsfjhlkjf"
+      },
+      mp3Comp: {
+        url: "hhh",
+        blob: "flkdnf",
+        buffer: "dsfjhlkjf"
+      },
+      stream: {
+        getAudioTracks: function() {
+          return [{stop}]
+        }
+      }
+    };
   },
   methods: {
-      callback (data) {
-        console.debug(data)
-      }
-    }
+    start: async function() {
+
+      this.recording = true;
+      let s = await microm.record()
+      this.stream = s;
+      console.log("recording...");
+    },
+    play: function() {
+      microm.play();
+    },
+    download: function() {
+      var fileName = "cat_voice";
+      microm.download(fileName);
+    },
+    stop: async function() {
+      this.recording = false;
+      let result = await microm.stop()
+      this.mp3 = result;
+      console.log(this.mp3.url, this.mp3.blob, this.mp3.buffer);
+      var newMP3 = microm.getMp3();
+      console.log(newMP3);
+      this.download();
+      this.stream.getAudioTracks().forEach(track => track.stop());
+    },
+  },
 });
 </script>
 

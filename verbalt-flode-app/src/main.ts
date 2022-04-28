@@ -2,11 +2,13 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import AudioRecorder from 'vue-audio-recorder'
+import Microm from 'microm'
 
-Vue.use(AudioRecorder);
+var microm = new Microm();
 
 Vue.config.productionTip = false;
+
+export default microm
 
 new Vue({
   router,
