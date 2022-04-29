@@ -10,6 +10,10 @@
 <script lang="ts">
 import Vue from "vue";
 import microm from "../main";
+import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
+import { S3Client } from "@aws-sdk/client-s3";
+import { createReadStream } from "node_modules/fs";
+import FormData from "form-data";
 
 export default Vue.extend({
   name: "message",
@@ -59,6 +63,28 @@ export default Vue.extend({
       this.download();
       this.stream.getAudioTracks().forEach(track => track.stop());
     },
+    post: function() {
+      const d = new Date();
+      let time = d.getTime();
+
+      const client = new S3Client({ region: "us-west-2" });
+      const Bucket = "johnsmith";
+      const Key = "user/eric/1";
+      const Fields = {
+        acl: "public-read",
+      };
+
+      
+
+      const form = new FormData();
+      Object.entries(Fields).forEach(([field, value]) => {
+        form.append(field, value);
+      });
+      form.append("file", createReadStream("path/to/a/file"));
+      form.submit("https://2ug9xdpzd2.execute-api.us-east-1.amazonaws.com/tests/", (err, res) => {
+        //handle the response
+      });
+    }
   },
 });
 </script>
